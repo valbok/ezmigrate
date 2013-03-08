@@ -1,0 +1,800 @@
+Index: kernel/classes/ezdatatype.php
+===================================================================
+--- kernel/classes/ezdatatype.php	(revision 22885)
++++ kernel/classes/ezdatatype.php	(revision 22886)
+@@ -1093,23 +1093,27 @@
+                 {
+                     $value = $objectAttribute->attribute( $attributeName );
+                     unset( $attributeNode );
+-                    $attributeNode = $dom->createElement( $xmlName, (string)$value );
++                    $attributeNode = $dom->createElement( $xmlName );
++                    $attributeNode->appendChild( $dom->createTextNode( (string)$value ) );
+                     $node->appendChild( $attributeNode );
+                 }
+                 else
+                 {
+-                    eZDebug::writeError( "The attribute '$attributeName' does not exists for contentobject attribute " . $objectAttribute->attribute( 'id' ),
++                    eZDebug::writeError( "The attribute '$attributeName' does not exist for contentobject attribute " . $objectAttribute->attribute( 'id' ),
+                                          'eZDataType::serializeContentObjectAttribute' );
+                 }
+             }
+         }
+         else
+         {
+-            $dataIntNode = $dom->createElement( 'data-int', (string)$objectAttribute->attribute( 'data_int' ) );
++            $dataIntNode = $dom->createElement( 'data-int' );
++            $dataIntNode->appendChild( $dom->createTextNode( (string)$objectAttribute->attribute( 'data_int' ) ) );
+             $node->appendChild( $dataIntNode );
+-            $dataFloatNode = $dom->createElement( 'data-float', (string)$objectAttribute->attribute( 'data_float' ) );
++            $dataFloatNode = $dom->createElement( 'data-float' );
++            $dataFloatNode->appendChild( $dom->createTextNode( (string)$objectAttribute->attribute( 'data_float' ) ) );
+             $node->appendChild( $dataFloatNode );
+-            $dataTextNode = $dom->createElement( 'data-text', $objectAttribute->attribute( 'data_text' ) );
++            $dataTextNode = $dom->createElement( 'data-text' );
++            $dataTextNode->appendChild( $dom->createTextNode( $objectAttribute->attribute( 'data_text' ) ) );
+             $node->appendChild( $dataTextNode );
+         }
+         return $node;
+Index: kernel/classes/datatypes/ezidentifier/ezidentifiertype.php
+===================================================================
+--- kernel/classes/datatypes/ezidentifier/ezidentifiertype.php	(revision 22885)
++++ kernel/classes/datatypes/ezidentifier/ezidentifiertype.php	(revision 22886)
+@@ -423,15 +423,20 @@
+ 
+         $dom = $attributeParametersNode->ownerDocument;
+ 
+-        $digitsNode = $dom->createElement( 'digits', $digits );
++        $digitsNode = $dom->createElement( 'digits' );
++        $digitsNode->appendChild( $dom->createTextNode( $digits ) );
+         $attributeParametersNode->appendChild( $digitsNode );
+-        $preTextNode = $dom->createElement( 'pre-text', $preText );
++        $preTextNode = $dom->createElement( 'pre-text' );
++        $preTextNode->appendChild( $dom->createTextNode( $preText ) );
+         $attributeParametersNode->appendChild( $preTextNode );
+-        $postTextNode = $dom->createElement( 'post-text', $postText );
++        $postTextNode = $dom->createElement( 'post-text' );
++        $postTextNode->appendChild( $dom->createTextNode( $postText ) );
+         $attributeParametersNode->appendChild( $postTextNode );
+-        $startValueNode = $dom->createElement( 'start-value', $startValue );
++        $startValueNode = $dom->createElement( 'start-value' );
++        $startValueNode->appendChild( $dom->createTextNode( $startValue ) );
+         $attributeParametersNode->appendChild( $startValueNode );
+-        $identifierNode = $dom->createElement( 'identifier', $identifier );
++        $identifierNode = $dom->createElement( 'identifier' );
++        $identifierNode->appendChild( $dom->createTextNode( $identifier ) );
+         $attributeParametersNode->appendChild( $identifierNode );
+     }
+ 
+Index: kernel/classes/datatypes/ezmultioption/ezmultioption.php
+===================================================================
+--- kernel/classes/datatypes/ezmultioption/ezmultioption.php	(revision 22885)
++++ kernel/classes/datatypes/ezmultioption/ezmultioption.php	(revision 22886)
+@@ -363,7 +363,8 @@
+         $root->setAttribute( 'option_counter', $this->OptionCounter );
+         $doc->appendChild( $root );
+ 
+-        $nameNode = $doc->createElement( 'name', $this->Name );
++        $nameNode = $doc->createElement( 'name' );
++        $nameNode->appendChild( $doc->createTextNode( $this->Name ) );
+         $root->appendChild( $nameNode );
+ 
+         $multiOptionsNode = $doc->createElement( "multioptions" );
+Index: kernel/classes/datatypes/ezmultioption/ezmultioptiontype.php
+===================================================================
+--- kernel/classes/datatypes/ezmultioption/ezmultioptiontype.php	(revision 22885)
++++ kernel/classes/datatypes/ezmultioption/ezmultioptiontype.php	(revision 22886)
+@@ -463,7 +463,8 @@
+     {
+         $defaultValue = $classAttribute->attribute( 'data_text1' );
+         $dom = $attributeParametersNode->ownerDocument;
+-        $defaultValueNode = $dom->createElement( 'default-value', $defaultValue );
++        $defaultValueNode = $dom->createElement( 'default-value' );
++        $defaultValueNode->appendChild( $dom->createTextNode( $defaultValue ) );
+         $attributeParametersNode->appendChild( $defaultValueNode );
+     }
+ 
+Index: kernel/classes/datatypes/eztext/eztexttype.php
+===================================================================
+--- kernel/classes/datatypes/eztext/eztexttype.php	(revision 22885)
++++ kernel/classes/datatypes/eztext/eztexttype.php	(revision 22886)
+@@ -262,8 +262,11 @@
+     */
+     function serializeContentClassAttribute( $classAttribute, $attributeNode, $attributeParametersNode )
+     {
++        $dom = $attributeParametersNode->ownerDocument;
+         $textColumns = $classAttribute->attribute( self::COLS_FIELD );
+-        $textColumnCountNode = $attributeParametersNode->ownerDocument->createElement( 'text-column-count', $textColumns );
++
++        $textColumnCountNode = $dom->createElement( 'text-column-count' );
++        $textColumnCountNode->appendChild( $dom->createTextNode( $textColumns ) );
+         $attributeParametersNode->appendChild( $textColumnCountNode );
+     }
+ 
+Index: kernel/classes/datatypes/ezselection/ezselectiontype.php
+===================================================================
+--- kernel/classes/datatypes/ezselection/ezselectiontype.php	(revision 22885)
++++ kernel/classes/datatypes/ezselection/ezselectiontype.php	(revision 22886)
+@@ -437,14 +437,17 @@
+         $isMultipleSelection = $classAttribute->attribute( 'data_int1'  );
+         $xmlString = $classAttribute->attribute( 'data_text5' );
+ 
+-        $dom = new DOMDocument( '1.0', 'utf-8' );
+-        $success = $dom->loadXML( $xmlString );
+-        $domRoot = $dom->documentElement;
++        $selectionDom = new DOMDocument( '1.0', 'utf-8' );
++        $success = $selectionDom->loadXML( $xmlString );
++        $domRoot = $selectionDom->documentElement;
+         $options = $domRoot->getElementsByTagName( 'options' )->item( 0 );
+ 
+-        $importedOptionsNode = $attributeParametersNode->ownerDocument->importNode( $options, true );
++        $dom = $attributeParametersNode->ownerDocument;
++
++        $importedOptionsNode = $dom->importNode( $options, true );
+         $attributeParametersNode->appendChild( $importedOptionsNode );
+-        $isMultiSelectNode = $attributeParametersNode->ownerDocument->createElement( 'is-multiselect', $isMultipleSelection );
++        $isMultiSelectNode = $dom->createElement( 'is-multiselect' );
++        $isMultiSelectNode->appendChild( $dom->createTextNode( $isMultipleSelection ) );
+         $attributeParametersNode->appendChild( $isMultiSelectNode );
+     }
+ 
+Index: kernel/classes/datatypes/ezrangeoption/ezrangeoptiontype.php
+===================================================================
+--- kernel/classes/datatypes/ezrangeoption/ezrangeoptiontype.php	(revision 22885)
++++ kernel/classes/datatypes/ezrangeoption/ezrangeoptiontype.php	(revision 22886)
+@@ -253,7 +253,9 @@
+     function serializeContentClassAttribute( $classAttribute, $attributeNode, $attributeParametersNode )
+     {
+         $defaultName = $classAttribute->attribute( 'data_text1' );
+-        $defaultNameNode = $attributeParametersNode->ownerDocument->createElement( 'default-name', $defaultName );
++        $dom = $attributeParametersNode->ownerDocument;
++        $defaultNameNode = $dom->createElement( 'default-name' );
++        $defaultNameNode->appendChild( $dom->createTextNode( $defaultName ) );
+         $attributeParametersNode->appendChild( $defaultNameNode );
+     }
+ 
+Index: kernel/classes/datatypes/ezpackage/ezpackagetype.php
+===================================================================
+--- kernel/classes/datatypes/ezpackage/ezpackagetype.php	(revision 22885)
++++ kernel/classes/datatypes/ezpackage/ezpackagetype.php	(revision 22886)
+@@ -248,7 +248,9 @@
+     function serializeContentClassAttribute( $classAttribute, $attributeNode, $attributeParametersNode )
+     {
+         $type = $classAttribute->attribute( self::TYPE_FIELD );
+-        $typeNode = $attributeParametersNode->ownerDocument->createElement( 'type', $type );
++        $dom = $attributeParametersNode->ownerDocument;
++        $typeNode = $dom->createElement( 'type' );
++        $typeNode->appendChild( $dom->createTextNode( $type ) );
+         $attributeParametersNode->appendChild( $typeNode );
+     }
+ 
+Index: kernel/classes/datatypes/ezinteger/ezintegertype.php
+===================================================================
+--- kernel/classes/datatypes/ezinteger/ezintegertype.php	(revision 22885)
++++ kernel/classes/datatypes/ezinteger/ezintegertype.php	(revision 22886)
+@@ -480,16 +480,19 @@
+         $minMaxState = $classAttribute->attribute( self::INPUT_STATE_FIELD );
+ 
+         $dom = $attributeParametersNode->ownerDocument;
+-        $defaultValueNode = $dom->createElement( 'default-value', $defaultValue );
++        $defaultValueNode = $dom->createElement( 'default-value' );
++        $defaultValueNode->appendChild( $dom->createTextNode( $defaultValue ) );
+         $attributeParametersNode->appendChild( $defaultValueNode );
+         if ( $minMaxState == self::HAS_MIN_VALUE or $minMaxState == self::HAS_MIN_MAX_VALUE )
+         {
+-            $minValueNode = $dom->createElement( 'min-value', $minValue );
++            $minValueNode = $dom->createElement( 'min-value' );
++            $minValueNode->appendChild( $dom->createTextNode( $minValue ) );
+             $attributeParametersNode->appendChild( $minValueNode );
+         }
+         if ( $minMaxState == self::HAS_MAX_VALUE or $minMaxState == self::HAS_MIN_MAX_VALUE )
+         {
+-            $maxValueNode = $dom->createElement( 'max-value', $maxValue );
++            $maxValueNode = $dom->createElement( 'max-value' );
++            $maxValueNode->appendChild( $dom->createTextNode( $maxValue ) );
+             $attributeParametersNode->appendChild( $maxValueNode );
+         }
+     }
+Index: kernel/classes/datatypes/eztime/eztimetype.php
+===================================================================
+--- kernel/classes/datatypes/eztime/eztimetype.php	(revision 22885)
++++ kernel/classes/datatypes/eztime/eztimetype.php	(revision 22886)
+@@ -395,8 +395,9 @@
+ 
+         if ( !is_null( $stamp ) )
+         {
+-            //include_once( 'lib/ezlocale/classes/ezdateutils.php' );
+-            $dateNode = $node->ownerDocument->createElement( 'time', eZDateUtils::rfc1123Date( $stamp ) );
++            $dom = $node->ownerDocument;
++            $dateNode = $dom->createElement( 'time' );
++            $dateNode->appendChild( $dom->createTextNode( eZDateUtils::rfc1123Date( $stamp ) ) );
+             $node->appendChild( $dateNode );
+         }
+         return $node;
+Index: kernel/classes/datatypes/ezobjectrelationlist/ezobjectrelationlisttype.php
+===================================================================
+--- kernel/classes/datatypes/ezobjectrelationlist/ezobjectrelationlisttype.php	(revision 22885)
++++ kernel/classes/datatypes/ezobjectrelationlist/ezobjectrelationlisttype.php	(revision 22886)
+@@ -1611,16 +1611,12 @@
+             $defaultPlacementNode->setAttribute( 'node-id', $content['default_placement']['node_id'] );
+             $attributeParametersNode->appendChild( $defaultPlacementNode );
+         }
+-        if ( is_numeric( $content['type'] ) )
+-        {
+-            $typeNode = $dom->createElement( 'type', $content['type'] );
+-            $attributeParametersNode->appendChild( $typeNode );
+-        }
+-        else
+-        {
+-            $typeNode = $dom->createElement( 'type', '0' );
+-            $attributeParametersNode->appendChild( $typeNode );
+-        }
++
++        $type = is_numeric( $content['type'] ) ? $content['type'] : '0';
++        $typeNode = $dom->createElement( 'type' );
++        $typeNode->appendChild( $dom->createTextNode( $type ) );
++        $attributeParametersNode->appendChild( $typeNode );
++
+         $classConstraintsNode = $dom->createElement( 'class-constraints' );
+         $attributeParametersNode->appendChild( $classConstraintsNode );
+         foreach ( $content['class_constraint_list'] as $classConstraint )
+@@ -1633,13 +1629,15 @@
+ 
+         if ( isset( $content['selection_type'] ) && is_numeric( $content['selection_type'] ) )
+         {
+-            $selectionTypeNode = $dom->createElement( 'selection-type', $content['selection_type'] );
++            $selectionTypeNode = $dom->createElement( 'selection-type' );
++            $selectionTypeNode->appendChild( $dom->createTextNode( $content['selection_type'] ) );
+             $attributeParametersNode->appendChild( $selectionTypeNode );
+         }
+ 
+         if ( isset( $content['object_class'] ) && is_numeric( $content['object_class'] ) )
+         {
+-            $objectClassNode = $dom->createElement( 'object-class', $content['object_class'] );
++            $objectClassNode = $dom->createElement( 'object-class' );
++            $objectClassNode->appendChild( $dom->createTextNode( $content['object_class'] ) );
+             $attributeParametersNode->appendChild( $objectClassNode );
+         }
+     }
+Index: kernel/classes/datatypes/ezmatrix/ezmatrixtype.php
+===================================================================
+--- kernel/classes/datatypes/ezmatrix/ezmatrixtype.php	(revision 22885)
++++ kernel/classes/datatypes/ezmatrix/ezmatrixtype.php	(revision 22886)
+@@ -485,9 +485,11 @@
+             $columns = $content->attribute( 'columns' );
+ 
+             $dom = $attributeParametersNode->ownerDocument;
+-            $defaultNameNode = $dom->createElement( 'default-name', $defaultName );
++            $defaultNameNode = $dom->createElement( 'default-name' );
++            $defaultNameNode->appendChild( $dom->createTextNode( $defaultName ) );
+             $attributeParametersNode->appendChild( $defaultNameNode );
+-            $defaultRowCountNode = $dom->createElement( 'default-row-count', $defaultRowCount );
++            $defaultRowCountNode = $dom->createElement( 'default-row-count' );
++            $defaultRowCountNode->appendChild( $dom->createTextNode( $defaultRowCount ) );
+             $attributeParametersNode->appendChild( $defaultRowCountNode );
+             $columnsNode = $dom->createElement( 'columns' );
+             $attributeParametersNode->appendChild( $columnsNode );
+Index: kernel/classes/datatypes/ezfloat/ezfloattype.php
+===================================================================
+--- kernel/classes/datatypes/ezfloat/ezfloattype.php	(revision 22885)
++++ kernel/classes/datatypes/ezfloat/ezfloattype.php	(revision 22886)
+@@ -382,16 +382,19 @@
+         $minMaxState = $classAttribute->attribute( self::INPUT_STATE_FIELD );
+ 
+         $dom = $attributeParametersNode->ownerDocument;
+-        $defaultValueNode = $dom->createElement( 'default-value', $defaultValue );
++        $defaultValueNode = $dom->createElement( 'default-value' );
++        $defaultValueNode->appendChild( $dom->createTextNode( $defaultValue ) );
+         $attributeParametersNode->appendChild( $defaultValueNode );
+         if ( $minMaxState == self::HAS_MIN_VALUE or $minMaxState == self::HAS_MIN_MAX_VALUE )
+         {
+-            $minValueNode = $dom->createElement( 'min-value', $minValue );
++            $minValueNode = $dom->createElement( 'min-value' );
++            $minValueNode->appendChild( $dom->createTextNode( $minValue ) );
+             $attributeParametersNode->appendChild( $minValueNode );
+         }
+         if ( $minMaxState == self::HAS_MAX_VALUE or $minMaxState == self::HAS_MIN_MAX_VALUE )
+         {
+-            $maxValueNode = $dom->createElement( 'max-value', $maxValue );
++            $maxValueNode = $dom->createElement( 'max-value' );
++            $maxValueNode->appendChild( $dom->createTextNode( $maxValue ) );
+             $attributeParametersNode->appendChild( $maxValueNode );
+         }
+     }
+Index: kernel/classes/datatypes/ezxmltext/ezxmltexttype.php
+===================================================================
+--- kernel/classes/datatypes/ezxmltext/ezxmltexttype.php	(revision 22885)
++++ kernel/classes/datatypes/ezxmltext/ezxmltexttype.php	(revision 22886)
+@@ -527,7 +527,9 @@
+     function serializeContentClassAttribute( $classAttribute, $attributeNode, $attributeParametersNode )
+     {
+         $textColumns = $classAttribute->attribute( self::COLS_FIELD );
+-        $textColumnCountNode = $attributeParametersNode->ownerDocument->createElement( 'text-column-count', $textColumns );
++        $dom = $attributeParametersNode->ownerDocument;
++        $textColumnCountNode = $dom->createElement( 'text-column-count' );
++        $textColumnCountNode->appendChild( $dom->createTextNode( $textColumns ) );
+         $attributeParametersNode->appendChild( $textColumnCountNode );
+     }
+ 
+Index: kernel/classes/datatypes/ezmultioption2/ezmultioption2type.php
+===================================================================
+--- kernel/classes/datatypes/ezmultioption2/ezmultioption2type.php	(revision 22885)
++++ kernel/classes/datatypes/ezmultioption2/ezmultioption2type.php	(revision 22886)
+@@ -646,7 +646,9 @@
+     function serializeContentClassAttribute( $classAttribute, $attributeNode, $attributeParametersNode )
+     {
+         $defaultValue = $classAttribute->attribute( 'data_text1' );
+-        $defaultValueNode = $attributeParametersNode->ownerDocument->createElement( 'default-value', $defaultValue );
++        $dom = $attributeParametersNode->ownerDocument;
++        $defaultValueNode = $dom->createElement( 'default-value' );
++        $defaultValueNode->appendChild( $dom->createTextNode( $defaultValue ) );
+         $attributeParametersNode->appendChild( $defaultValueNode );
+     }
+ 
+Index: kernel/classes/datatypes/ezoption/ezoptiontype.php
+===================================================================
+--- kernel/classes/datatypes/ezoption/ezoptiontype.php	(revision 22885)
++++ kernel/classes/datatypes/ezoption/ezoptiontype.php	(revision 22886)
+@@ -406,7 +406,9 @@
+     function serializeContentClassAttribute( $classAttribute, $attributeNode, $attributeParametersNode )
+     {
+         $defaultValue = $classAttribute->attribute( 'data_text1' );
+-        $defaultValueNode = $attributeParametersNode->ownerDocument->createElement( 'default-value', $defaultValue );
++        $dom = $attributeParametersNode->ownerDocument;
++        $defaultValueNode = $dom->createElement( 'default-value' );
++        $defaultValueNode->appendChild( $dom->createTextNode( $defaultValue ) );
+         $attributeParametersNode->appendChild( $defaultValueNode );
+     }
+ 
+Index: kernel/classes/datatypes/ezdate/ezdatetype.php
+===================================================================
+--- kernel/classes/datatypes/ezdate/ezdatetype.php	(revision 22885)
++++ kernel/classes/datatypes/ezdate/ezdatetype.php	(revision 22886)
+@@ -382,8 +382,9 @@
+ 
+         if ( !is_null( $stamp ) )
+         {
+-            //include_once( 'lib/ezlocale/classes/ezdateutils.php' );
+-            $dateNode = $node->ownerDocument->createElement( 'date', eZDateUtils::rfc1123Date( $stamp ) );
++            $dom = $node->ownerDocument;
++            $dateNode = $dom->createElement( 'date' );
++            $dateNode->appendChild( $dom->createTextNode( eZDateUtils::rfc1123Date( $stamp ) ) );
+             $node->appendChild( $dateNode );
+         }
+         return $node;
+Index: kernel/classes/datatypes/ezinisetting/ezinisettingtype.php
+===================================================================
+--- kernel/classes/datatypes/ezinisetting/ezinisettingtype.php	(revision 22885)
++++ kernel/classes/datatypes/ezinisetting/ezinisettingtype.php	(revision 22886)
+@@ -483,17 +483,23 @@
+         $siteAccess = $classAttribute->attribute( self::SITE_ACCESS_LIST_FIELD );
+ 
+         $dom = $attributeParametersNode->ownerDocument;
+-        $fileNode = $dom->createElement( 'file', $file );
++        $fileNode = $dom->createElement( 'file' );
++        $fileNode->appendChild( $dom->createTextNode( $file ) );
+         $attributeParametersNode->appendChild( $fileNode );
+-        $sectionNode = $dom->createElement( 'section', $section );
++        $sectionNode = $dom->createElement( 'section' );
++        $sectionNode->appendChild( $dom->createTextNode( $section ) );
+         $attributeParametersNode->appendChild( $sectionNode );
+-        $parameterNode = $dom->createElement( 'parameter', $parameter );
++        $parameterNode = $dom->createElement( 'parameter' );
++        $parameterNode->appendChild( $dom->createTextNode( $parameter ) );
+         $attributeParametersNode->appendChild( $parameterNode );
+-        $typeNode = $dom->createElement( 'type', $type );
++        $typeNode = $dom->createElement( 'type' );
++        $typeNode->appendChild( $dom->createTextNode( $type ) );
+         $attributeParametersNode->appendChild( $typeNode );
+-        $iniInstanceNode = $dom->createElement( 'ini_instance', $iniInstance );
++        $iniInstanceNode = $dom->createElement( 'ini_instance' );
++        $iniInstanceNode->appendChild( $dom->createTextNode( $iniInstance ) );
+         $attributeParametersNode->appendChild( $iniInstanceNode );
+-        $siteAccessListNode = $dom->createElement( 'site_access_list', $siteAccess );
++        $siteAccessListNode = $dom->createElement( 'site_access_list' );
++        $siteAccessListNode->appendChild( $dom->createTextNode( $siteAccess ) );
+         $attributeParametersNode->appendChild( $siteAccessListNode );
+     }
+ 
+@@ -643,9 +649,11 @@
+ 
+         $dom = $node->ownerDocument;
+ 
+-        $makeEmptyArrayNode = $dom->createElement( 'make_empty_array', $makeEmptyArray );
++        $makeEmptyArrayNode = $dom->createElement( 'make_empty_array' );
++        $makeEmptyArrayNode->appendChild( $dom->createTextNode( $makeEmptyArray ) );
+         $node->appendChild( $makeEmptyArrayNode );
+-        $valueNode = $dom->createElement( 'value', $value );
++        $valueNode = $dom->createElement( 'value' );
++        $valueNode->appendChild( $dom->createTextNode( $value ) );
+         $node->appendChild( $valueNode );
+ 
+         return $node;
+Index: kernel/classes/datatypes/ezmedia/ezmediatype.php
+===================================================================
+--- kernel/classes/datatypes/ezmedia/ezmediatype.php	(revision 22885)
++++ kernel/classes/datatypes/ezmedia/ezmediatype.php	(revision 22886)
+@@ -659,11 +659,13 @@
+ 
+         $dom = $attributeParametersNode->ownerDocument;
+ 
+-        $maxSizeNode = $dom->createElement( 'max-size', $maxSize );
++        $maxSizeNode = $dom->createElement( 'max-size' );
++        $maxSizeNode->appendChild( $dom->createTextNode( $maxSize ) );
+         $maxSizeNode->setAttribute( 'unit-size', 'mega' );
+         $attributeParametersNode->appendChild( $maxSizeNode );
+ 
+-        $typeNode = $dom->createElement( 'type', $type );
++        $typeNode = $dom->createElement( 'type' );
++        $typeNode->appendChild( $dom->createTextNode( $type ) );
+         $attributeParametersNode->appendChild( $typeNode );
+     }
+ 
+Index: kernel/classes/datatypes/ezimage/ezimagealiashandler.php
+===================================================================
+--- kernel/classes/datatypes/ezimage/ezimagealiashandler.php	(revision 22885)
++++ kernel/classes/datatypes/ezimage/ezimagealiashandler.php	(revision 22886)
+@@ -1292,7 +1292,8 @@
+                         foreach ( $infoItem as $infoArrayKey => $infoArrayItem )
+                         {
+                             unset( $arrayItemNode );
+-                            $arrayItemNode = $dom->createElement( 'item', base64_encode( $infoArrayItem ) );
++                            $arrayItemNode = $dom->createElement( 'item' );
++                            $arrayItemNode->appendChild( $dom->createTextNode( base64_encode( $infoArrayItem ) ) );
+                             $arrayItemNode->setAttribute( 'key', $infoArrayKey );
+                             $arrayItemNode->setAttribute( 'base64', 1 );
+ 
+Index: kernel/classes/datatypes/ezimage/ezimagetype.php
+===================================================================
+--- kernel/classes/datatypes/ezimage/ezimagetype.php	(revision 22885)
++++ kernel/classes/datatypes/ezimage/ezimagetype.php	(revision 22886)
+@@ -485,7 +485,10 @@
+     function serializeContentClassAttribute( $classAttribute, $attributeNode, $attributeParametersNode )
+     {
+         $maxSize = $classAttribute->attribute( self::FILESIZE_FIELD );
+-        $maxSizeNode = $attributeParametersNode->ownerDocument->createElement( 'max-size', $maxSize );
++        $dom = $attributeParametersNode->ownerDocument;
++
++        $maxSizeNode = $dom->createElement( 'max-size' );
++        $maxSizeNode->appendChild( $dom->createTextNode( $maxSize ) );
+         $maxSizeNode->setAttribute( 'unit-size', 'mega' );
+         $attributeParametersNode->appendChild( $maxSizeNode );
+     }
+Index: kernel/classes/datatypes/ezbinaryfile/ezbinaryfiletype.php
+===================================================================
+--- kernel/classes/datatypes/ezbinaryfile/ezbinaryfiletype.php	(revision 22885)
++++ kernel/classes/datatypes/ezbinaryfile/ezbinaryfiletype.php	(revision 22886)
+@@ -593,7 +593,8 @@
+     {
+         $dom = $attributeParametersNode->ownerDocument;
+         $maxSize = $classAttribute->attribute( self::MAX_FILESIZE_FIELD );
+-        $maxSizeNode = $dom->createElement( 'max-size', $maxSize );
++        $maxSizeNode = $dom->createElement( 'max-size' );
++        $maxSizeNode->appendChild( $dom->createTextNode( $maxSize ) );
+         $maxSizeNode->setAttribute( 'unit-size', 'mega' );
+         $attributeParametersNode->appendChild( $maxSizeNode );
+     }
+Index: kernel/classes/datatypes/ezkeyword/ezkeywordtype.php
+===================================================================
+--- kernel/classes/datatypes/ezkeyword/ezkeywordtype.php	(revision 22885)
++++ kernel/classes/datatypes/ezkeyword/ezkeywordtype.php	(revision 22886)
+@@ -310,7 +310,8 @@
+         $keyword->fetch( $objectAttribute );
+         $keyWordString = $keyword->keywordString();
+         $dom = $node->ownerDocument;
+-        $keywordStringNode = $dom->createElement( 'keyword-string', $keyWordString );
++        $keywordStringNode = $dom->createElement( 'keyword-string' );
++        $keywordStringNode->appendChild( $dom->createTextNode( $keyWordString ) );
+         $node->appendChild( $keywordStringNode );
+ 
+         return $node;
+Index: kernel/classes/datatypes/ezdatetime/ezdatetimetype.php
+===================================================================
+--- kernel/classes/datatypes/ezdatetime/ezdatetimetype.php	(revision 22885)
++++ kernel/classes/datatypes/ezdatetime/ezdatetimetype.php	(revision 22886)
+@@ -467,8 +467,9 @@
+     */
+     function serializeContentClassAttribute( $classAttribute, $attributeNode, $attributeParametersNode )
+     {
++        $dom = $attributeParametersNode->ownerDocument;
+         $defaultValue = $classAttribute->attribute( self::DEFAULT_FIELD );
+-        $defaultValueNode = $attributeParametersNode->ownerDocument->createElement( 'default-value' );
++        $defaultValueNode = $dom->createElement( 'default-value' );
+ 
+         switch ( $defaultValue )
+         {
+@@ -490,7 +491,7 @@
+ 
+                     if ( $adjustmentNode )
+                     {
+-                        $importedAdjustmentNode = $defaultValueNode->ownerDocument->importNode( $adjustmentNode, true );
++                        $importedAdjustmentNode = $dom->importNode( $adjustmentNode, true );
+                         $defaultValueNode->appendChild( $importedAdjustmentNode );
+                     }
+                 }
+@@ -566,8 +567,9 @@
+ 
+         if ( $stamp )
+         {
+-            //include_once( 'lib/ezlocale/classes/ezdateutils.php' );
+-            $dateTimeNode = $node->ownerDocument->createElement( 'date_time', eZDateUtils::rfc1123Date( $stamp ) );
++            $dom = $node->ownerDocument;
++            $dateTimeNode = $dom->createElement( 'date_time' );
++            $dateTimeNode->appendChild( $dom->createTextNode( eZDateUtils::rfc1123Date( $stamp ) ) );
+             $node->appendChild( $dateTimeNode );
+         }
+ 
+Index: kernel/classes/datatypes/ezurl/ezurltype.php
+===================================================================
+--- kernel/classes/datatypes/ezurl/ezurltype.php	(revision 22885)
++++ kernel/classes/datatypes/ezurl/ezurltype.php	(revision 22886)
+@@ -334,7 +334,8 @@
+         if ( is_object( $url ) and
+              trim( $url->attribute( 'url' ) ) != '' )
+         {
+-            $urlNode = $dom->createElement( 'url', $url->attribute( 'url' ) );
++            $urlNode = $dom->createElement( 'url' );
++            $urlNode->appendChild( $dom->createTextNode( urlencode( $url->attribute( 'url' ) ) ) );
+             $urlNode->setAttribute( 'original-url-md5', $url->attribute( 'original_url_md5' ) );
+             $urlNode->setAttribute( 'is-valid', $url->attribute( 'is_valid' ) );
+             $urlNode->setAttribute( 'last-checked', $url->attribute( 'last_checked' ) );
+@@ -345,7 +346,8 @@
+ 
+         if ( $objectAttribute->attribute( 'data_text' ) )
+         {
+-            $textNode = $dom->createElement( 'text', $objectAttribute->attribute( 'data_text' ) );
++            $textNode = $dom->createElement( 'text' );
++            $textNode->appendChild( $dom->createTextNode( $objectAttribute->attribute( 'data_text' ) ) );
+             $node->appendChild( $textNode );
+         }
+ 
+Index: kernel/classes/datatypes/ezobjectrelation/ezobjectrelationtype.php
+===================================================================
+--- kernel/classes/datatypes/ezobjectrelation/ezobjectrelationtype.php	(revision 22885)
++++ kernel/classes/datatypes/ezobjectrelation/ezobjectrelationtype.php	(revision 22886)
+@@ -597,7 +597,8 @@
+             {
+                 $relatedObjectRemoteID = $relatedObject->attribute( 'remote_id' );
+                 $dom = $node->ownerDocument;
+-                $relatedObjectRemoteIDNode = $dom->createElement( 'related-object-remote-id', $relatedObjectRemoteID );
++                $relatedObjectRemoteIDNode = $dom->createElement( 'related-object-remote-id' );
++                $relatedObjectRemoteIDNode->appendChild( $dom->createTextNode( $relatedObjectRemoteID ) );
+                 $node->appendChild( $relatedObjectRemoteIDNode );
+             }
+         }
+Index: kernel/classes/datatypes/ezstring/ezstringtype.php
+===================================================================
+--- kernel/classes/datatypes/ezstring/ezstringtype.php	(revision 22885)
++++ kernel/classes/datatypes/ezstring/ezstringtype.php	(revision 22886)
+@@ -379,16 +379,14 @@
+         $maxLength = $classAttribute->attribute( self::MAX_LEN_FIELD );
+         $defaultString = $classAttribute->attribute( self::DEFAULT_STRING_FIELD );
+         $dom = $attributeParametersNode->ownerDocument;
+-        $maxLengthNode = $dom->createElement( 'max-length', $maxLength );
++        $maxLengthNode = $dom->createElement( 'max-length' );
++        $maxLengthNode->appendChild( $dom->createTextNode( $maxLength ) );
+         $attributeParametersNode->appendChild( $maxLengthNode );
++        $defaultStringNode = $dom->createElement( 'default-string' );
+         if ( $defaultString )
+         {
+-            $defaultStringNode = $dom->createElement( 'default-string', $defaultString );
++            $defaultStringNode->appendChild( $dom->createTextNode( $defaultString ) );
+         }
+-        else
+-        {
+-            $defaultStringNode = $dom->createElement( 'default-string' );
+-        }
+         $attributeParametersNode->appendChild( $defaultStringNode );
+     }
+ 
+Index: kernel/classes/datatypes/ezsubtreesubscription/ezsubtreesubscriptiontype.php
+===================================================================
+--- kernel/classes/datatypes/ezsubtreesubscription/ezsubtreesubscriptiontype.php	(revision 22885)
++++ kernel/classes/datatypes/ezsubtreesubscription/ezsubtreesubscriptiontype.php	(revision 22886)
+@@ -144,8 +144,11 @@
+     function serializeContentObjectAttribute( $package, $objectAttribute )
+     {
+         $node = $this->createContentObjectAttributeDOMNode( $objectAttribute );
++        $dom = $node->ownerDocument;
++
+         $value = $objectAttribute->attribute( 'data_int' );
+-        $valueNode = $node->ownerDocument->createElement( 'value', $value );
++        $valueNode = $dom->createElement( 'value' );
++        $valueNode->appendChild( $dom->createTextNode( $value ) );
+         $node->appendChild( $valueNode );
+ 
+         return $node;
+Index: kernel/classes/ezcontentobjectversion.php
+===================================================================
+--- kernel/classes/ezcontentobjectversion.php	(revision 22885)
++++ kernel/classes/ezcontentobjectversion.php	(revision 22886)
+@@ -1497,14 +1497,12 @@
+             $attributes = $this->contentObjectAttributes( $language );
+             foreach ( $attributes as $attribute )
+             {
+-                unset( $serializedAttributeNode );
+                 $serializedAttributeNode = $attribute->serialize( $package );
+                 $importedSerializedAttributeNode = $dom->importNode( $serializedAttributeNode, true );
+                 $translationNode->appendChild( $importedSerializedAttributeNode );
+             }
+ 
+             $versionNode->appendChild( $translationNode );
+-            unset( $translationNode );
+             $exportedLanguages[] = $language;
+         }
+ 
+@@ -1514,11 +1512,9 @@
+         $contentNodeArray = eZContentObjectTreeNode::fetchByContentObjectID( $this->ContentObjectID, true, $this->Version );
+         foreach( $contentNodeArray as $contentNode )
+         {
+-            unset( $contentNodeDOMNode );
+             $contentNodeDOMNode = $contentNode->serialize( $options, $contentNodeIDArray, $topNodeIDArray );
+             if ( $contentNodeDOMNode !== false )
+             {
+-                unset( $importedContentDOMNode );
+                 $importedContentDOMNode = $dom->importNode( $contentNodeDOMNode, true );
+                 $nodeAssignmentListNode->appendChild( $importedContentDOMNode );
+             }
+@@ -1542,8 +1538,8 @@
+                 {
+                     $relatedObjectRemoteID = $relatedObject->attribute( 'remote_id' );
+ 
+-                    unset( $relationNode );
+-                    $relationNode = $dom->createElement( 'related-object-remote-id', $relatedObjectRemoteID );
++                    $relationNode = $dom->createElement( 'related-object-remote-id' );
++                    $relationNode->appendChild( $dom->createTextNode( $relatedObjectRemoteID ) );
+ 
+                     $relationListNode->appendChild( $relationNode );
+                 }
+Index: kernel/classes/packagehandlers/ezcontentclass/ezcontentclasspackagehandler.php
+===================================================================
+--- kernel/classes/packagehandlers/ezcontentclass/ezcontentclasspackagehandler.php	(revision 22885)
++++ kernel/classes/packagehandlers/ezcontentclass/ezcontentclasspackagehandler.php	(revision 22886)
+@@ -563,13 +563,17 @@
+         $serializedNameListNode = $dom->createElement( 'serialized-name-list' );
+         $serializedNameListNode->appendChild( $dom->createTextNode( $class->attribute( 'serialized_name_list' ) ) );
+         $classNode->appendChild( $serializedNameListNode );
+-        $identifierNode = $dom->createElement( 'identifier', $class->attribute( 'identifier' ) );
++        $identifierNode = $dom->createElement( 'identifier' );
++        $identifierNode->appendChild( $dom->createTextNode( $class->attribute( 'identifier' ) ) );
+         $classNode->appendChild( $identifierNode );
+-        $remoteIDNode = $dom->createElement( 'remote-id', $class->attribute( 'remote_id' ) );
++        $remoteIDNode = $dom->createElement( 'remote-id' );
++        $remoteIDNode->appendChild( $dom->createTextNode( $class->attribute( 'remote_id' ) ) );
+         $classNode->appendChild( $remoteIDNode );
+-        $objectNamePatternNode = $dom->createElement( 'object-name-pattern', $class->attribute( 'contentobject_name' ) );
++        $objectNamePatternNode = $dom->createElement( 'object-name-pattern' );
++        $objectNamePatternNode->appendChild( $dom->createTextNode( $class->attribute( 'contentobject_name' ) ) );
+         $classNode->appendChild( $objectNamePatternNode );
+-        $urlAliasPatternNode = $dom->createElement( 'url-alias-pattern', $class->attribute( 'url_alias_name' ) );
++        $urlAliasPatternNode = $dom->createElement( 'url-alias-pattern' );
++        $urlAliasPatternNode->appendChild( $dom->createTextNode( $class->attribute( 'url_alias_name' ) ) );
+         $classNode->appendChild( $urlAliasPatternNode );
+         $isContainer = $class->attribute( 'is_container' ) ? 'true' : 'false';
+         $classNode->setAttribute( 'is-container', $isContainer );
+@@ -587,9 +591,14 @@
+         $classURL = 'http://' . $siteName . '/class/view/' . $class->attribute( 'id' );
+         $siteURL = 'http://' . $siteName . '/';
+ 
+-        $remoteNode->appendChild( $dom->createElement( 'site-url', $siteURL ) );
+-        $remoteNode->appendChild( $dom->createElement( 'url', $classURL ) );
++        $siteUrlNode = $dom->createElement( 'site-url' );
++        $siteUrlNode->appendChild( $dom->createTextNode( $siteURL ) );
++        $remoteNode->appendChild( $siteUrlNode );
+ 
++        $urlNode = $dom->createElement( 'url' );
++        $urlNode->appendChild( $dom->createTextNode( $classURL ) );
++        $remoteNode->appendChild( $urlNode );
++
+         $classGroupsNode = $dom->createElement( 'groups' );
+ 
+         $classGroupList = eZContentClassClassGroup::fetchGroupList( $class->attribute( 'id' ),
+@@ -608,32 +617,39 @@
+         }
+         $remoteNode->appendChild( $classGroupsNode );
+ 
+-        $idNode = $dom->createElement( 'id', $class->attribute( 'id' ) );
++        $idNode = $dom->createElement( 'id' );
++        $idNode->appendChild( $dom->createTextNode( $class->attribute( 'id' ) ) );
+         $remoteNode->appendChild( $idNode );
+-        $createdNode = $dom->createElement( 'created', $class->attribute( 'created' ) );
++        $createdNode = $dom->createElement( 'created' );
++        $createdNode->appendChild( $dom->createTextNode( $class->attribute( 'created' ) ) );
+         $remoteNode->appendChild( $createdNode );
+-        $modifiedNode = $dom->createElement( 'modified', $class->attribute( 'modified' ) );
++        $modifiedNode = $dom->createElement( 'modified' );
++        $modifiedNode->appendChild( $dom->createTextNode( $class->attribute( 'modified' ) ) );
+         $remoteNode->appendChild( $modifiedNode );
+ 
+         $creatorNode = $dom->createElement( 'creator' );
+         $remoteNode->appendChild( $creatorNode );
+-        $creatorIDNode = $dom->createElement( 'user-id', $class->attribute( 'creator_id' ) );
++        $creatorIDNode = $dom->createElement( 'user-id' );
++        $creatorIDNode->appendChild( $dom->createTextNode( $class->attribute( 'creator_id' ) ) );
+         $creatorNode->appendChild( $creatorIDNode );
+         $creator = $class->attribute( 'creator' );
+         if ( $creator )
+         {
+-            $creatorLoginNode = $dom->createElement( 'user-login', $creator->attribute( 'login' ) );
++            $creatorLoginNode = $dom->createElement( 'user-login' );
++            $creatorLoginNode->appendChild( $dom->createTextNode( $creator->attribute( 'login' ) ) );
+             $creatorNode->appendChild( $creatorLoginNode );
+         }
+ 
+         $modifierNode = $dom->createElement( 'modifier' );
+         $remoteNode->appendChild( $modifierNode );
+-        $modifierIDNode = $dom->createElement( 'user-id', $class->attribute( 'modifier_id' ) );
++        $modifierIDNode = $dom->createElement( 'user-id' );
++        $modifierIDNode->appendChild( $dom->createTextNode( $class->attribute( 'modifier_id' ) ) );
+         $modifierNode->appendChild( $modifierIDNode );
+         $modifier = $class->attribute( 'modifier' );
+         if ( $modifier )
+         {
+-            $modifierLoginNode = $dom->createElement( 'user-login', $modifier->attribute( 'login' ) );
++            $modifierLoginNode = $dom->createElement( 'user-login' );
++            $modifierLoginNode->appendChild( $dom->createTextNode( $modifier->attribute( 'login' ) ) );
+             $modifierNode->appendChild( $modifierLoginNode );
+         }
+         // Remote data end
+@@ -658,16 +674,20 @@
+             $attributeRemoteNode = $dom->createElement( 'remote' );
+             $attributeNode->appendChild( $attributeRemoteNode );
+ 
+-            $attributeIDNode = $dom->createElement( 'id', $attribute->attribute( 'id' ) );
++            $attributeIDNode = $dom->createElement( 'id' );
++            $attributeIDNode->appendChild( $dom->createTextNode( $attribute->attribute( 'id' ) ) );
+             $attributeRemoteNode->appendChild( $attributeIDNode );
+ 
+-            $attributeSerializedNameListNode = $dom->createElement( 'serialized-name-list', $attribute->attribute( 'serialized_name_list' ) );
++            $attributeSerializedNameListNode = $dom->createElement( 'serialized-name-list' );
++            $attributeSerializedNameListNode->appendChild( $dom->createTextNode( $attribute->attribute( 'serialized_name_list' ) ) );
+             $attributeNode->appendChild( $attributeSerializedNameListNode );
+ 
+-            $attributeIdentifierNode = $dom->createElement( 'identifier', $attribute->attribute( 'identifier' ) );
++            $attributeIdentifierNode = $dom->createElement( 'identifier' );
++            $attributeIdentifierNode->appendChild( $dom->createTextNode( $attribute->attribute( 'identifier' ) ) );
+             $attributeNode->appendChild( $attributeIdentifierNode );
+ 
+-            $attributePlacementNode = $dom->createElement( 'placement', $attribute->attribute( 'placement' ) );
++            $attributePlacementNode = $dom->createElement( 'placement' );
++            $attributePlacementNode->appendChild( $dom->createTextNode( $attribute->attribute( 'placement' ) ) );
+             $attributeNode->appendChild( $attributePlacementNode );
+ 
+             $attributeParametersNode = $dom->createElement( 'datatype-parameters' );
+Index: kernel/classes/packagehandlers/ezcontentobject/ezcontentobjectpackagehandler.php
+===================================================================
+--- kernel/classes/packagehandlers/ezcontentobject/ezcontentobjectpackagehandler.php	(revision 22885)
++++ kernel/classes/packagehandlers/ezcontentobject/ezcontentobjectpackagehandler.php	(revision 22886)
+@@ -308,7 +308,8 @@
+         foreach( $this->RootNodeObjectArray as $rootNode )
+         {
+             unset( $topNode );
+-            $topNode = $dom->createElement( 'top-node', $rootNode->attribute( 'name' ) );
++            $topNode = $dom->createElement( 'top-node' );
++            $topNode->appendChild( $dom->createTextNode( $rootNode->attribute( 'name' ) ) );
+             $topNode->setAttribute( 'node-id', $rootNode->attribute( 'node_id' ) );
+             $topNode->setAttribute( 'remote-id', $rootNode->attribute( 'remote_id' ) );
+             $topNodeListDOMNode->appendChild( $topNode );
+@@ -332,7 +333,8 @@
+         foreach( $options['site_access_array'] as $siteAccess )
+         {
+             unset( $siteAccessNode );
+-            $siteAccessNode = $dom->createElement( 'site-access', $siteAccess );
++            $siteAccessNode = $dom->createElement( 'site-access' );
++            $siteAccessNode->appendChild( $dom->createTextNode( $siteAccess ) );
+             $siteAccessListDOMNode->appendChild( $siteAccessNode );
+         }
+ 
+@@ -577,9 +579,11 @@
+         }
+ 
+         $dom->appendChild( $fileDOMNode );
+-        $originalPathNode = $dom->createElement( 'original-path', $filename );
++        $originalPathNode = $dom->createElement( 'original-path' );
++        $originalPathNode->appendChild( $dom->createTextNode( $filename ) );
+         $fileDOMNode->appendChild( $originalPathNode );
+-        $pathNode = $dom->createElement( 'path', $path );
++        $pathNode = $dom->createElement( 'path' );
++        $pathNode->appendChild( $dom->createTextNode( $path ) );
+         $fileDOMNode->appendChild( $pathNode );
+ 
+         $destinationPath = $this->Package->path() . '/' .  eZContentObjectPackageHandler::contentObjectDirectory() . '/' . $path;
